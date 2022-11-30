@@ -1,7 +1,7 @@
 #include "lists.h"
 
 /**
- * loop_flag - Detects loop in a linked list.
+ * loop_flag2 - Detects loop in a linked list.
  * @head: Pointer to head of the list.
  * Return: If there is a loop - number of nodes.
  *	   If there is no loop - 0.
@@ -71,7 +71,7 @@ size_t free_listint_safe(listint_t **h)
 			node++;
 			tmp = (*h)->next;
 			free(*h);
-			*h = tmp; 
+			*h = tmp;
 		}
 		*h = NULL;
 	}
