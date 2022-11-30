@@ -1,5 +1,11 @@
 #include "lists.h"
 
+/**
+ * loop_flag - Detects loop in a linked list.
+ * @head: Pointer to head of the list.
+ * Return: If there is a loop - number of nodes.
+ *	   If there is no loop - 0.
+ */
 size_t loop_flag(const listint_t *head)
 {
 	const listint_t *fast, *slow;
@@ -11,7 +17,7 @@ size_t loop_flag(const listint_t *head)
 	slow = head;
 	fast = head;
 
-	while (slow && fast && fast->next)
+	while (fast && fast->next)
 	{
 		slow = slow->next;
 		fast = fast->next->next;
@@ -38,13 +44,17 @@ size_t loop_flag(const listint_t *head)
 	return (0);
 }
 
-/**/
+/**
+ * print_listint_safe - Prints a linked list with a loop.
+ * @head: Pointer to the head of the list to be printed.
+ * Return: Number of elements/nodes in the list.
+ */
 size_t print_listint_safe(const listint_t *head)
 {
 	size_t node, i = 0;
 
 	if (head == NULL)
-		exit (98);
+		exit(98);
 
 	node = loop_flag(head);
 
@@ -60,7 +70,7 @@ size_t print_listint_safe(const listint_t *head)
 
 	else
 	{
-		while(i < node)
+		while (i < node)
 		{
 			printf("[%p] %d\n", (void *)head, head->n);
 			head = head->next;
