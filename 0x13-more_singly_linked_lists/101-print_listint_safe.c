@@ -48,6 +48,7 @@ size_t loop_flag(const listint_t *head)
  * print_listint_safe - Prints a linked list with a loop.
  * @head: Pointer to the head of the list to be printed.
  * Return: Number of elements/nodes in the list.
+ *	   If the function fails - 98.
  */
 size_t print_listint_safe(const listint_t *head)
 {
