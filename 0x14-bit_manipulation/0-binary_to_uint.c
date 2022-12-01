@@ -10,18 +10,18 @@
  */
 int pwr(int n, int i)
 {
-    int x = 1;
-    
-    if (i == 0)
-        return 1;
-    if (i == 1)
-        return n;
-    while(i > 0)
-    {
-        x *= n;
-        i--;
-    }
-    return x;
+	int x = 1;
+
+	if (i == 0)
+		return (1);
+	if (i == 1)
+		return (n);
+	while (i > 0)
+	{
+		x *= n;
+		i--;
+	}
+	return (x);
 }
 
 /**
@@ -29,24 +29,23 @@ int pwr(int n, int i)
  *	     of a string of 0s & 1s.
  * @b: string to be evaluated.
  * @i: power index.
- * @k: pointer to string index.
+ * @ptr: pointer to string index.
  * Return: integer equivalent of binary string.
  */
 unsigned int rec_bin(const char *b, int i, int *ptr)
 {
-    unsigned int n, x;
-    int k = *ptr;
-    
-    if (b[k] == '\0')
-        return 0;
-    else
-    {
-        i--;
-        n = pwr(2, i);
-        x = (b[k] - '0') * n;
-        k++;
-    }
-    return x + rec_bin(b, i, &k);
+	unsigned int n, x;
+	int k = *ptr;
+
+	if (b[k] == '\0')
+		return (0);
+
+	i--;
+	n = pwr(2, i);
+	x = (b[k] - '0') * n;
+	k++;
+
+	return (x + rec_bin(b, i, &k));
 }
 /**
  * binary_to_uint - convert binary string
@@ -58,15 +57,15 @@ unsigned int rec_bin(const char *b, int i, int *ptr)
  */
 unsigned int binary_to_uint(const char *b)
 {
-    int i = 0, k = 0;
-    unsigned int n;
-    
-    for (; b[i]; i++)
-    {
-        if (b[i] != '0' && b[i] != '1')
-            return 0;
-    }
-    n = rec_bin(b, i, &k);
-    
-    return n;
+	int i = 0, k = 0;
+	unsigned int n;
+
+	for (; b[i]; i++)
+	{
+		if (b[i] != '0' && b[i] != '1')
+			return (0);
+	}
+	n = rec_bin(b, i, &k);
+
+	return (n);
 }
