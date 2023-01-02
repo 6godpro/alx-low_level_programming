@@ -25,17 +25,16 @@ int pwr(int n, int i)
 }
 
 /**
- * rec_bin - find the integer equivalent
+ * rec_bin - Find the integer equivalent
  *	     of a string of 0s & 1s.
- * @b: string to be evaluated.
- * @i: power index.
- * @ptr: pointer to string index.
- * Return: integer equivalent of binary string.
+ * @b: String to be evaluated.
+ * @i: Power index.
+ * @k: String index.
+ * Return: Integer equivalent of binary string.
  */
-unsigned int rec_bin(const char *b, int i)
+unsigned int rec_bin(const char *b, int i, int k)
 {
 	unsigned int n, x;
-	static int k = 0;
 
 	if (b[k] == '\0')
 		return (0);
@@ -45,7 +44,7 @@ unsigned int rec_bin(const char *b, int i)
 	x = (b[k] - '0') * n;
 	k++;
 
-	return (x + rec_bin(b, i));
+	return (x + rec_bin(b, i, k));
 }
 /**
  * binary_to_uint - convert binary string
@@ -57,7 +56,7 @@ unsigned int rec_bin(const char *b, int i)
  */
 unsigned int binary_to_uint(const char *b)
 {
-	int i = 0;
+	int i = 0, k = 0;
 	unsigned int n;
 
 	if (b == NULL)
@@ -68,7 +67,7 @@ unsigned int binary_to_uint(const char *b)
 		if (b[i] != '0' && b[i] != '1')
 			return (0);
 	}
-	n = rec_bin(b, i);
+	n = rec_bin(b, i, k);
 
 	return (n);
 }
