@@ -22,12 +22,14 @@ dir_t *get_path(char *path);
 char **tok_arr(char *str, const char *delim);
 int execute_cmd(char **argv);
 char **clear(char **args);
+char *concat_path(char *pathname, char *progname);
+char *find(char *cname);
 
 
 /* functionalities */
 int _unsetenv(const char *name);
 int _setenv(const char *name, const char *value, int overwrite);
-char *_getenv(const char *name);
+char **_getenv(const char *var);
 
 
 /* TODO include documentation for struct */

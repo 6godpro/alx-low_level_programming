@@ -1,9 +1,9 @@
 #include "shell.h"
 
 
-char **clear(char **args)
+char **clear()
 {
-	char *line;
+	char *line, **args;
 	size_t n = 0;
 	ssize_t line_len;
 
@@ -15,6 +15,8 @@ char **clear(char **args)
 		return (NULL);
 	}
 	args = tok_arr(line, " ");
+
+	free(line);
 
 	return (args);
 }

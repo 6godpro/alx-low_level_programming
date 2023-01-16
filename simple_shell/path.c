@@ -3,38 +3,40 @@
 
 dir_t *add_node_end(dir_t **head, char *dir)
 {
-	dir_t *new_node = malloc(sizeof(dir_t));
-	dir_t *last;
+	dir_t *new, *last;
 
-	if (!new_node)
+	new = malloc(sizeof(dir_t));
+	if (!new)
 		return (NULL);
-	new_node->dir = dir;
-	new_node->next = NULL;
-	if (*head)
+
+	new->dir = dir;
+	new->next = NULL;
+
+	if (*head == NULL)
+		*head = new;
+	else
 	{
 		last = *head;
 		while (last->next != NULL)
+		{
 			last = last->next;
-		last->next = new_node;
+		}
+		last->next = new;
 	}
-	else
-	{
-		*head = new_node;
-	}
-	return (new_node);
-}
 
+	return (new);
+}
 
 void free_list(dir_t *head)
 {
-	dir_t *next;
+	dir_t *tmp;
 
 	while (head)
 	{
-		next = head->next;
+		tmp = head->next;
 		free(head->dir);
 		free(head);
-		head = next;
+		head = tmp;
 	}
 }
 
