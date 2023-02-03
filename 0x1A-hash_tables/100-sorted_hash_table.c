@@ -25,6 +25,8 @@ shash_table_t *shash_table_create(unsigned long int size)
 	for (i = 0; i < size; i++)
 		ht->array[i] = NULL;
 
+	ht->shead = NULL;
+	ht->stail = NULL;
 	return (ht);
 }
 
@@ -53,7 +55,7 @@ int shash_table_set(shash_table_t *ht, const char *key, const char *value)
 
 	key_idx = key_index((const unsigned char *)key, ht->size);
 	exist_node = ht->shead;
-	for (; exist_node; exist_node = exist_node->next)
+	for (; exist_node; exist_node = exist_node->snext)
 	{
 		if (strcmp(exist_node->key, key) == 0)
 		{
