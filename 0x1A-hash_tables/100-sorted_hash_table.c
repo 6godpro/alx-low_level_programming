@@ -31,7 +31,7 @@ shash_table_t *shash_table_create(unsigned long int size)
 }
 
 /**
- * hash_table_set - Add or update an element in a sorted
+ * shash_table_set - Add or update an element in a sorted
  *		    hash table.
  * @ht: A pointer to the hash table.
  * @key: The key to add - cannot be an empty string.
@@ -44,11 +44,10 @@ int shash_table_set(shash_table_t *ht, const char *key, const char *value)
 {
 	unsigned long int key_idx;
 	char *value_cpy;
-	shash_node_t *newNode, *exist_node, *tmp;
+	shash_node_t *newNode, *exist_node;
 
 	if (!ht || !key || !value || *key == '\0')
 		return (0);
-
 	value_cpy = strdup(value);
 	if (!value_cpy)
 		return (0);
@@ -70,7 +69,6 @@ int shash_table_set(shash_table_t *ht, const char *key, const char *value)
 		free(value_cpy);
 		return (0);
 	}
-
 	newNode->value = value_cpy;
 	newNode->key = strdup(key);
 	if (newNode->key == NULL)
@@ -81,8 +79,26 @@ int shash_table_set(shash_table_t *ht, const char *key, const char *value)
 	}
 	newNode->next = ht->array[key_idx];
 	ht->array[key_idx] = newNode;
+	if (!sort_list(ht, newNode, key))
+		return (0);
+	return (1);
+}
 
-	/* sort keys in ascending order */
+/**
+ * sort_list - Sorts a doubly linked list in ascending order.
+ * @ht: ...
+ * @newNode: ...
+ * @key: ...
+ * Return: 0 - If it fails.
+ *	   Otherwise - 1.
+ */
+int sort_list(shash_table_t *ht, shash_node_t *newNode, const char *key)
+{
+	shash_node_t *tmp;
+
+	if (!ht || !newNode || !key || *key == '\0')
+		return (0);
+
 	if (ht->shead == NULL)
 	{
 		newNode->snext = NULL;
