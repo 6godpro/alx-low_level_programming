@@ -1,18 +1,11 @@
 #include "hash_tables.h"
 
-shash_table_t *shash_table_create(unsigned long int size);
-int shash_table_set(shash_table_t *ht, const char *key, const char *value);
-char *shash_table_get(const shash_table_t *ht, const char *key);
-void shash_table_print(const shash_table_t *ht);
-void shash_table_print_rev(const shash_table_t *ht);
-void shash_table_delete(shash_table_t *ht);
-
 /**
  * shash_table_create - Creates a sorted hash table.
- * @size: The size of newNode sorted hash table.
+ * @size: Size of the array/hash table.
  *
- * Return: If an error occurs - NULL.
- *         Otherwise - a pointer to the newNode sorted hash table.
+ * Return: A pointer to the newNodely created hash table.
+ *	   O/w - NULL.
  */
 shash_table_t *shash_table_create(unsigned long int size)
 {
@@ -27,70 +20,89 @@ shash_table_t *shash_table_create(unsigned long int size)
 	ht->array = malloc(sizeof(shash_node_t *) * size);
 	if (ht->array == NULL)
 		return (NULL);
+
+	/* let all shash nodes be initialized to NULL. */
 	for (i = 0; i < size; i++)
 		ht->array[i] = NULL;
+
 	ht->shead = NULL;
 	ht->stail = NULL;
-
 	return (ht);
 }
 
 /**
- * shash_table_set - Adds an element to a sorted hash table.
- * @ht: A pointer to the sorted hash table.
+ * shash_table_set - Add or update an element in a sorted
+ *		    hash table.
+ * @ht: A pointer to the hash table.
  * @key: The key to add - cannot be an empty string.
  * @value: The value associated with key.
  *
- * Return: Upon failure - 0.
- *         Otherwise - 1.
+ * Return: If it succeeds - 1.
+ *         Otherwise - 0.
  */
 int shash_table_set(shash_table_t *ht, const char *key, const char *value)
 {
-	shash_node_t *newNode, *tmp;
-	char *value_copy;
-	unsigned long int index;
+	unsigned long int key_idx;
+	char *value_cpy;
+	shash_node_t *newNode, *exist_node;
 
-	if (ht == NULL || key == NULL || *key == '\0' || value == NULL)
+	if (!ht || !key || !value || *key == '\0')
+		return (0);
+	value_cpy = strdup(value);
+	if (!value_cpy)
 		return (0);
 
-	value_copy = strdup(value);
-	if (value_copy == NULL)
-		return (0);
-
-	index = key_index((const unsigned char *)key, ht->size);
-	tmp = ht->shead;
-	while (tmp)
+	key_idx = key_index((const unsigned char *)key, ht->size);
+	exist_node = ht->shead;
+	for (; exist_node; exist_node = exist_node->snext)
 	{
-		if (strcmp(tmp->key, key) == 0)
+		if (strcmp(exist_node->key, key) == 0)
 		{
-			free(tmp->value);
-			tmp->value = value_copy;
+			free(exist_node->value);
+			exist_node->value = value_cpy;
 			return (1);
 		}
-		tmp = tmp->snext;
 	}
-
 	newNode = malloc(sizeof(shash_node_t));
 	if (newNode == NULL)
 	{
-		free(value_copy);
+		free(value_cpy);
 		return (0);
 	}
+	newNode->value = value_cpy;
 	newNode->key = strdup(key);
 	if (newNode->key == NULL)
 	{
-		free(value_copy);
+		free(value_cpy);
 		free(newNode);
 		return (0);
 	}
-	newNode->value = value_copy;
-	newNode->next = ht->array[index];
-	ht->array[index] = newNode;
+	newNode->next = ht->array[key_idx];
+	ht->array[key_idx] = newNode;
+	if (!sort_list(ht, newNode, key))
+		return (0);
+	return (1);
+}
+
+/**
+ * sort_list - Sorts a doubly linked list in ascending order.
+ * @ht: ...
+ * @newNode: ...
+ * @key: ...
+ * Return: 0 - If it fails.
+ *	   Otherwise - 1.
+ */
+int sort_list(shash_table_t *ht, shash_node_t *newNode, const char *key)
+{
+	shash_node_t *tmp;
+
+	if (!ht || !newNode || !key || *key == '\0')
+		return (0);
 
 	if (ht->shead == NULL)
 	{
-		newNode->sprev = NULL;
 		newNode->snext = NULL;
+		newNode->sprev = NULL;
 		ht->shead = newNode;
 		ht->stail = newNode;
 	}
@@ -104,46 +116,48 @@ int shash_table_set(shash_table_t *ht, const char *key, const char *value)
 	else
 	{
 		tmp = ht->shead;
-		while (tmp->snext != NULL && strcmp(tmp->snext->key, key) < 0)
+		while (tmp->snext && strcmp(tmp->snext->key, key) < 0)
 			tmp = tmp->snext;
-		newNode->sprev = tmp;
 		newNode->snext = tmp->snext;
+		newNode->sprev = tmp;
 		if (tmp->snext == NULL)
 			ht->stail = newNode;
 		else
 			tmp->snext->sprev = newNode;
 		tmp->snext = newNode;
 	}
-
 	return (1);
 }
 
 /**
  * shash_table_get - Retrieve the value associated with
- *                   a key in a sorted hash table.
- * @ht: A pointer to the sorted hash table.
- * @key: The key to get the value of.
+ *                  a key in a sorted hash table.
+ * @ht: A pointer to the hash table.
+ * @key: The key.
  *
- * Return: If the key cannot be matched - NULL.
- *         Otherwise - the value associated with key in ht.
+ * Return: The value associated with key in ht.
+ *         Otherwise, if the key is not found - NULL.
  */
 char *shash_table_get(const shash_table_t *ht, const char *key)
 {
+	unsigned long int key_idx;
 	shash_node_t *node;
-	unsigned long int index;
 
-	if (ht == NULL || key == NULL || *key == '\0')
+	if (!ht || !key || *key == '\0')
 		return (NULL);
 
-	index = key_index((const unsigned char *)key, ht->size);
-	if (index >= ht->size)
+	key_idx = key_index((const unsigned char *)key, ht->size);
+	if (key_idx >= ht->size)
 		return (NULL);
 
-	node = ht->shead;
-	while (node != NULL && strcmp(node->key, key) != 0)
-		node = node->snext;
+	node = ht->array[key_idx];
+	for (; node; node = node->snext)
+	{
+		if (strcmp(node->key, key) == 0)
+			return (node->value);
+	}
 
-	return ((node == NULL) ? NULL : node->value);
+	return (NULL);
 }
 
 /**
@@ -159,19 +173,21 @@ void shash_table_print(const shash_table_t *ht)
 
 	node = ht->shead;
 	printf("{");
-	while (node != NULL)
+	while (node)
 	{
 		printf("'%s': '%s'", node->key, node->value);
-		node = node->snext;
-		if (node != NULL)
+		if (node->snext)
 			printf(", ");
+		node = node->snext;
 	}
 	printf("}\n");
 }
 
+
 /**
- * shash_table_print_rev - Prints a sorted hash table in reverse order.
- * @ht: A pointer to the sorted hash table to print.
+ * shash_table_print_rev - Prints a sorted hash table in
+ *			   reverse order.
+ * @ht: A pointer to the sorted hash table.
  */
 void shash_table_print_rev(const shash_table_t *ht)
 {
@@ -182,12 +198,12 @@ void shash_table_print_rev(const shash_table_t *ht)
 
 	node = ht->stail;
 	printf("{");
-	while (node != NULL)
+	while (node)
 	{
 		printf("'%s': '%s'", node->key, node->value);
-		node = node->sprev;
-		if (node != NULL)
+		if (node->sprev)
 			printf(", ");
+		node = node->sprev;
 	}
 	printf("}\n");
 }
@@ -198,22 +214,20 @@ void shash_table_print_rev(const shash_table_t *ht)
  */
 void shash_table_delete(shash_table_t *ht)
 {
-	shash_table_t *head = ht;
-	shash_node_t *node, *tmp;
+	shash_node_t *tmp;
 
 	if (ht == NULL)
 		return;
 
-	node = ht->shead;
-	while (node)
+	while (ht->shead)
 	{
-		tmp = node->snext;
-		free(node->key);
-		free(node->value);
-		free(node);
-		node = tmp;
+		tmp = ht->shead->snext;
+		free(ht->shead->key);
+		free(ht->shead->value);
+		free(ht->shead);
+		ht->shead = tmp;
 	}
 
-	free(head->array);
-	free(head);
+	free(ht->array);
+	free(ht);
 }
