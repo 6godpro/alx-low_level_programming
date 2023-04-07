@@ -50,8 +50,7 @@ int shash_table_set(shash_table_t *ht, const char *key, const char *value)
 		return (0);
 
 	idx = key_index((const unsigned char *)key, ht->size);
-	tmp = ht->array[idx];
-	while (tmp)
+	for (tmp = ht->array[idx]; tmp; tmp = tmp->next)
 	{
 		if (strcmp(key, tmp->key) == 0)
 		{
@@ -59,7 +58,6 @@ int shash_table_set(shash_table_t *ht, const char *key, const char *value)
 			tmp->value = value_cpy;
 			return (1);
 		}
-		tmp = tmp->next;
 	}
 	node = malloc(sizeof(shash_node_t));
 	if (node == NULL)
@@ -74,10 +72,26 @@ int shash_table_set(shash_table_t *ht, const char *key, const char *value)
 		free(node);
 		return (0);
 	}
-
 	node->value = value_cpy;
 	node->next = ht->array[idx];
 	ht->array[idx] = node;
+
+	sorted_insert(ht, node, key);
+	return (1);
+}
+/**
+ * sorted_insert - Inserts a node into a sorted doubly linked list.
+ * @ht: A pointer to the head of the sorted hash table.
+ * @node: The new node to insert into the linked list.
+ * @key: The key to use to determine the position at which to insert
+ *       the new node.
+ */
+void sorted_insert(shash_table_t *ht, shash_node_t *node, const char *key)
+{
+	shash_node_t *tmp;
+
+	if (!ht || !node || !key || *key == '\0')
+		return;
 
 	if (ht->shead == NULL)
 	{
@@ -113,8 +127,6 @@ int shash_table_set(shash_table_t *ht, const char *key, const char *value)
 			ht->stail = node;
 		}
 	}
-
-	return (1);
 }
 
 /**
