@@ -30,7 +30,7 @@ int binary_search_helper(int *array, size_t start, size_t end, int value)
 {
 	size_t mid;
 
-	if (start <= end)
+	if (start < end)
 	{
 		print(array, start, end);
 		mid = (start + end) / 2;
