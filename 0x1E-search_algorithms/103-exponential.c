@@ -66,4 +66,3 @@ int exponential_search(int *array, size_t size, int value)
 
 	return (_binary_search(array, value, bound / 2, end));
 }
-
