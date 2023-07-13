@@ -22,10 +22,10 @@ int jump_search(int *array, size_t size, int value)
 	for (i = 0; i < size; i += jump)
 	{
 		printf("Value checked array[%ld] = [%d]\n", i, array[i]);
-		/* If the value is in the range or it's the last value. */
+		/* If the value is in the range or out of range. */
 		if ((i + jump < size &&
 		     array[i] <= value && array[i + jump] >= value)
-		    || i == size - 1)
+		    || i + jump >= size)
 		{
 			printf("Value found between indexes [%ld] and [%ld]\n",
 			       i, i + jump);
