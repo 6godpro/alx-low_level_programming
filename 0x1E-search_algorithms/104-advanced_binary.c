@@ -5,9 +5,11 @@
  * @array: The array to be printed.
  * @start: The start of the array.
  * @end: The end of the array.
+ * @size: The original size of the array.
  */
-void print(int *array, size_t start, size_t end)
+void print(int *array, size_t start, size_t end, size_t size)
 {
+	end = end == size ? end - 1 : end;
 	printf("Searching in array: ");
 	for (; start <= end; start++)
 	{
@@ -17,36 +19,39 @@ void print(int *array, size_t start, size_t end)
 }
 
 /**
- * binary_search_helper - Searches for the minimum index at which
+ * _binary_search - Searches for the minimum index at which
  *                        a value occurs.
  * @array: The array to be searched.
  * @start: The start of the array.
  * @end: The end of the array.
- * @value: The value to be searched for.
+ * @n: The value to be searched for.
+ * @size: The original size of the array.
  * Return: If the value exists in the array - The minimum index.
  *         Otherwise - -1.
  */
-int binary_search_helper(int *array, size_t start, size_t end, int value)
+int _binary_search(int *array, size_t start, size_t end, int n, size_t size)
 {
 	size_t mid;
 
 	if (start <= end)
 	{
-		print(array, start, end);
+		print(array, start, end, size);
 		mid = (start + end) / 2;
 
-		if (array[mid] < value)
-			return (binary_search_helper(array, mid + 1, end, value));
-		else if (array[mid] > value)
-			return (binary_search_helper(array, start,
-						     mid - 1, value));
-		else if (array[mid] == value)
+		if (array[mid] < n)
+			return (_binary_search(array, mid + 1, end,
+					       n, size));
+		else if (array[mid] > n)
+			return (_binary_search(array, start,
+					       mid - 1, n, size));
+		else if (array[mid] == n)
 		{
-			if (mid == 0 || array[mid - 1] != value)
+			/* If at start or previous value != current value */
+			if (mid == 0 || array[mid - 1] != n)
 				return (mid);
 			else
-				return (binary_search_helper(array, start,
-							     mid, value));
+				return (_binary_search(array, start,
+						       mid, n, size));
 		}
 	}
 	return (-1);
@@ -63,8 +68,12 @@ int binary_search_helper(int *array, size_t start, size_t end, int value)
  */
 int advanced_binary(int *array, size_t size, int value)
 {
+	size_t temp_size = size;
+
 	if (array == NULL)
 		return (-1);
 
-	return (binary_search_helper(array, 0, size - 1, value));
+	size = size % 2 == 0 ? size - 1 : size;
+
+	return (_binary_search(array, 0, size, value, temp_size));
 }
